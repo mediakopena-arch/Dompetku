@@ -225,12 +225,14 @@ function wipe(){var ids=tx.map(function(x){return String(x.id)});tx=[];save();re
 window.dompetku={set:function(a){tx=a;save();render()},all:function(){return tx.slice()},key:KEY};
 var DEF="bd58e2fbd3b7df9b829bf9b6ec78bbce2150e0b1de075eae5882950668f0e729",ADM="8e847e87b4f82c23c1212bcaf40291bb4ba712144e7d16981c8f0297f1947390",PK="dompetku-pw",OKK="dompetku-ok";
 function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v)}catch(e){}return null}
+function ss(k,v){try{if(v===undefined)return sessionStorage.getItem(k);if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v)}catch(e){}return null}
+ls(OKK,null);
 function H(p){return crypto.subtle.digest("SHA-256",new TextEncoder().encode("dompetku:"+p)).then(function(b){return Array.prototype.map.call(new Uint8Array(b),function(x){return("0"+x.toString(16)).slice(-2)}).join("")})}
 var pw=ls(PK)||DEF;
 function lockUp(){document.body.classList.add("locked");$("lock").classList.add("on");$("lpw").value="";$("lerr").textContent="";setTimeout(function(){$("lpw").focus()},50)}
 function unlock(){document.body.classList.remove("locked");$("lock").classList.remove("on")}
-function gate(){if(ls(OKK)===pw)unlock();else lockUp()}
-$("lf").onsubmit=function(e){e.preventDefault();var v=$("lpw").value;if(!v)return;H(v).then(function(h){if(h===pw){ls(OKK,pw);unlock()}else{$("lerr").textContent="Sandi salah.";$("lpw").value="";$("lpw").focus()}},function(){$("lerr").textContent="Perangkat tidak mendukung (butuh HTTPS)."})};
+function gate(){if(ss(OKK)===pw)unlock();else lockUp()}
+$("lf").onsubmit=function(e){e.preventDefault();var v=$("lpw").value;if(!v)return;H(v).then(function(h){if(h===pw){ss(OKK,pw);unlock()}else{$("lerr").textContent="Sandi salah.";$("lpw").value="";$("lpw").focus()}},function(){$("lerr").textContent="Perangkat tidak mendukung (butuh HTTPS)."})};
 $("adm").onclick=function(){$("apw").value="";$("npw").value="";$("npw2").value="";$("aerr1").textContent="";$("aerr2").textContent="";$("a1").style.display="";$("a2").style.display="none";$("asheet").classList.add("on");setTimeout(function(){$("apw").focus()},50)};
 function aclose(){$("asheet").classList.remove("on")}
 $("aclose").onclick=aclose;$("asheet").onclick=function(e){if(e.target===this)aclose()};
@@ -238,8 +240,8 @@ $("a1").onsubmit=function(e){e.preventDefault();H($("apw").value).then(function(
 $("a2").onsubmit=function(e){e.preventDefault();var a=$("npw").value,b=$("npw2").value,er=$("aerr2");
  if(a.length<4){er.textContent="Minimal 4 karakter.";return}
  if(a!==b){er.textContent="Kedua sandi tidak sama.";return}
- H(a).then(function(h){pw=h;ls(PK,h);ls(OKK,h);var y=sy();if(y&&y.setPw)y.setPw(h);aclose()})};
-$("alock").onclick=function(){ls(OKK,null);aclose();lockUp()};
+ H(a).then(function(h){pw=h;ls(PK,h);ss(OKK,h);var y=sy();if(y&&y.setPw)y.setPw(h);aclose()})};
+$("alock").onclick=function(){ss(OKK,null);aclose();lockUp()};
 window.dompetkuAuth={get:function(){return pw},custom:function(){return pw!==DEF},set:function(h){if(!h||h===pw)return;pw=h;ls(PK,h);gate()}};
 gate();
 render();
