@@ -12,22 +12,19 @@ self.addEventListener("activate", (e) => {
   );
 });
 
-// Cache dulu, perbarui di belakang layar. Font Google ikut tersimpan agar tampilan tetap cantik saat offline.
+// Ambil dari jaringan dulu supaya selalu versi terbaru; cache hanya cadangan saat offline.
 self.addEventListener("fetch", (e) => {
   if (e.request.method !== "GET") return;
   const u = new URL(e.request.url);
   const ok = u.origin === location.origin || ["fonts.googleapis.com", "fonts.gstatic.com", "www.gstatic.com"].includes(u.hostname);
   if (!ok) return; // jangan cache lalu lintas Firebase
   e.respondWith(
-    caches.match(e.request).then((hit) => {
-      const net = fetch(e.request).then((res) => {
-        if (res && (res.ok || res.type === "opaque")) {
-          const copy = res.clone();
-          caches.open(CACHE).then((c) => c.put(e.request, copy));
-        }
-        return res;
-      }).catch(() => hit || caches.match("./index.html"));
-      return hit || net;
-    })
+    fetch(e.request).then((res) => {
+      if (res && (res.ok || res.type === "opaque")) {
+        const copy = res.clone();
+        caches.open(CACHE).then((c) => c.put(e.request, copy));
+      }
+      return res;
+    }).catch(() => caches.match(e.request).then((hit) => hit || caches.match("./index.html")))
   );
 });
