@@ -1,4 +1,3 @@
-// Ganti nilai di bawah dengan konfigurasi dari Firebase (lihat README.md).
 export const firebaseConfig = {
   apiKey: "AIzaSyATBpHrUKRIFT-rtMLjFL0Klbm5JwitUyI",
   authDomain: "dompetku-b9653.firebaseapp.com",
@@ -7,3 +6,6 @@ export const firebaseConfig = {
   messagingSenderId: "477670532441",
   appId: "1:477670532441:web:39e1620c78f3542b8f9848"
 };
+
+// Satu catatan bersama untuk semua perangkat yang membuka aplikasi ini.
+export const ROOM = "g0q0r4ismv62mkjxclqto6zq";
