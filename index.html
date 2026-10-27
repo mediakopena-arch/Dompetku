@@ -85,11 +85,12 @@ input,select{width:100%;border:1.5px solid var(--line);background:var(--card);co
 .save{width:100%;border:0;background:linear-gradient(135deg,#2f78d6,#0f2f66);color:#fff;border-radius:99px;padding:14px;font:800 16px var(--bd);cursor:pointer;margin-top:6px}
 .link{border:0;background:none;color:var(--mute);font:700 13px var(--bd);text-decoration:underline;cursor:pointer;display:block;margin:18px auto 0}
 .save.danger{background:var(--danger)}.sheet.dlg{align-items:center}.sheet.dlg .panel{border-radius:24px;width:calc(100% - 32px)}.sheet.dlg p{margin:6px 0 14px;color:var(--mute)}.share h3{font-size:17px}.share p{margin:6px 0;color:var(--mute);font-size:13px}.share code{display:block;word-break:break-all;background:var(--soft);padding:8px 10px;border-radius:12px;margin:8px 0;font-size:13px;color:var(--ink)}.share .ok{color:var(--mint);font-weight:700}.share .bad{color:var(--danger);font-weight:700}.view{display:none}.view.on{display:block}
+.gear{border:1px solid var(--line);background:var(--card);border-radius:50%;width:38px;height:38px;font-size:17px;cursor:pointer}.tr{display:flex;gap:10px;align-items:center}.lock{position:fixed;inset:0;z-index:50;background:var(--bg);display:none;align-items:center;justify-content:center;padding:24px}.lock.on{display:flex}.lock .box{width:100%;max-width:340px;text-align:center}.lock h1{font-size:30px;font-weight:800;color:var(--plum);margin:10px 0 4px}.lock p{color:var(--mute);margin:0 0 16px}.lock input{text-align:center;font-size:18px}.err{color:var(--danger);font-weight:700;min-height:22px;margin:4px 0}body.locked .app,body.locked nav,body.locked .fab{visibility:hidden}
 </style>
 </head>
 <body>
 <div class="app">
-  <div class="top"><h1>Dompetku</h1><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="var(--rose)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7.5A2.5 2.5 0 0 1 6.5 5H17v3"/><rect x="3" y="8" width="18" height="12" rx="2.5"/><path d="M16 14h5v-3h-5a1.5 1.5 0 0 0 0 3z"/></svg></div>
+  <div class="top"><h1>Dompetku</h1><div class="tr"><button class="gear" id="adm" aria-label="Menu admin">⚙️</button><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="var(--rose)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7.5A2.5 2.5 0 0 1 6.5 5H17v3"/><rect x="3" y="8" width="18" height="12" rx="2.5"/><path d="M16 14h5v-3h-5a1.5 1.5 0 0 0 0 3z"/></svg></div></div>
 
   <section class="view on" id="v-home">
     <div class="hero"><div class="lbl">Total saldo</div><div class="big" id="total"></div><div class="wal" id="wals"></div></div>
@@ -131,6 +132,14 @@ input,select{width:100%;border:1.5px solid var(--line);background:var(--card);co
   <label for="note">Catatan</label><input id="note" placeholder="Contoh: kopi sama teman">
   <button class="save" id="save">Simpan</button>
   <button class="link" id="cancel">Batal</button>
+</div></div>
+
+<div class="lock" id="lock"><form class="box" id="lf" autocomplete="on"><svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="var(--rose)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7.5A2.5 2.5 0 0 1 6.5 5H17v3"/><rect x="3" y="8" width="18" height="12" rx="2.5"/><path d="M16 14h5v-3h-5a1.5 1.5 0 0 0 0 3z"/></svg><h1>Dompetku</h1><p>Masukkan kata sandi</p><input type="password" id="lpw" autocomplete="current-password" aria-label="Kata sandi" placeholder="Kata sandi"><div class="err" id="lerr" role="alert"></div><button class="save" type="submit">Masuk</button></form></div>
+<div class="sheet" id="asheet"><div class="panel" role="dialog" aria-label="Menu admin">
+  <h3>Menu admin</h3>
+  <form id="a1"><label for="apw">Sandi admin</label><input type="password" id="apw" autocomplete="off" placeholder="Sandi admin"><div class="err" id="aerr1" role="alert"></div><button class="save" type="submit">Buka</button></form>
+  <form id="a2" style="display:none"><label for="npw">Sandi masuk baru</label><input type="password" id="npw" autocomplete="new-password" placeholder="Minimal 4 karakter"><label for="npw2">Ulangi sandi baru</label><input type="password" id="npw2" autocomplete="new-password" placeholder="Ulangi sandi"><div class="err" id="aerr2" role="alert"></div><button class="save" type="submit">Simpan sandi masuk</button><button class="link" type="button" id="alock">Kunci aplikasi sekarang</button></form>
+  <button class="link" id="aclose" type="button">Tutup</button>
 </div></div>
 
 <script>
@@ -214,6 +223,25 @@ function put(o){tx.push(o);save();render();var y=sy();if(y)y.put(o)}
 function del(id){tx=tx.filter(function(x){return String(x.id)!==id});save();render();var y=sy();if(y)y.del(id)}
 function wipe(){var ids=tx.map(function(x){return String(x.id)});tx=[];save();render();var y=sy();if(y)y.wipe(ids)}
 window.dompetku={set:function(a){tx=a;save();render()},all:function(){return tx.slice()},key:KEY};
+var DEF="bd58e2fbd3b7df9b829bf9b6ec78bbce2150e0b1de075eae5882950668f0e729",ADM="8e847e87b4f82c23c1212bcaf40291bb4ba712144e7d16981c8f0297f1947390",PK="dompetku-pw",OKK="dompetku-ok";
+function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v)}catch(e){}return null}
+function H(p){return crypto.subtle.digest("SHA-256",new TextEncoder().encode("dompetku:"+p)).then(function(b){return Array.prototype.map.call(new Uint8Array(b),function(x){return("0"+x.toString(16)).slice(-2)}).join("")})}
+var pw=ls(PK)||DEF;
+function lockUp(){document.body.classList.add("locked");$("lock").classList.add("on");$("lpw").value="";$("lerr").textContent="";setTimeout(function(){$("lpw").focus()},50)}
+function unlock(){document.body.classList.remove("locked");$("lock").classList.remove("on")}
+function gate(){if(ls(OKK)===pw)unlock();else lockUp()}
+$("lf").onsubmit=function(e){e.preventDefault();var v=$("lpw").value;if(!v)return;H(v).then(function(h){if(h===pw){ls(OKK,pw);unlock()}else{$("lerr").textContent="Sandi salah.";$("lpw").value="";$("lpw").focus()}},function(){$("lerr").textContent="Perangkat tidak mendukung (butuh HTTPS)."})};
+$("adm").onclick=function(){$("apw").value="";$("npw").value="";$("npw2").value="";$("aerr1").textContent="";$("aerr2").textContent="";$("a1").style.display="";$("a2").style.display="none";$("asheet").classList.add("on");setTimeout(function(){$("apw").focus()},50)};
+function aclose(){$("asheet").classList.remove("on")}
+$("aclose").onclick=aclose;$("asheet").onclick=function(e){if(e.target===this)aclose()};
+$("a1").onsubmit=function(e){e.preventDefault();H($("apw").value).then(function(h){if(h===ADM){$("a1").style.display="none";$("a2").style.display="";$("npw").focus()}else{$("aerr1").textContent="Sandi admin salah.";$("apw").value=""}},function(){$("aerr1").textContent="Perangkat tidak mendukung."})};
+$("a2").onsubmit=function(e){e.preventDefault();var a=$("npw").value,b=$("npw2").value,er=$("aerr2");
+ if(a.length<4){er.textContent="Minimal 4 karakter.";return}
+ if(a!==b){er.textContent="Kedua sandi tidak sama.";return}
+ H(a).then(function(h){pw=h;ls(PK,h);ls(OKK,h);var y=sy();if(y&&y.setPw)y.setPw(h);aclose()})};
+$("alock").onclick=function(){ls(OKK,null);aclose();lockUp()};
+window.dompetkuAuth={get:function(){return pw},custom:function(){return pw!==DEF},set:function(h){if(!h||h===pw)return;pw=h;ls(PK,h);gate()}};
+gate();
 render();
 })();
 </script>

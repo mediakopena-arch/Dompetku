@@ -1,4 +1,4 @@
-const CACHE = "dompetku-v6";
+const CACHE = "dompetku-v7";
 const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./sync.js", "./firebase-config.js", "./icon-192.png", "./icon-512.png", "./maskable-512.png", "./apple-touch-icon.png"];
 
 self.addEventListener("install", (e) => {

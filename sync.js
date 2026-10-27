@@ -22,11 +22,14 @@ async function start() {
     const [{ initializeApp }, { getAuth, signInAnonymously }, fs] = await Promise.all([import(B + "firebase-app.js"), import(B + "firebase-auth.js"), import(B + "firebase-firestore.js")]);
     const app = initializeApp(firebaseConfig);
     await signInAnonymously(getAuth(app));
-    const col = fs.collection(fs.getFirestore(app), "rooms", ROOM, "tx");
+    const db = fs.getFirestore(app);
+    const col = fs.collection(db, "rooms", ROOM, "tx");
+    const authRef = fs.doc(db, "rooms", ROOM, "cfg", "auth");
     const fail = (err) => setStatus("Gagal menyimpan: " + msg(err), "bad");
     window.dompetkuSync = {
       put: (o) => fs.setDoc(fs.doc(col, String(o.id)), o).catch(fail),
       del: (id) => fs.deleteDoc(fs.doc(col, String(id))).catch(fail),
+      setPw: (h) => fs.setDoc(authRef, { hash: h }).catch(fail),
       wipe: async (ids) => { try { for (const id of ids) await fs.deleteDoc(fs.doc(col, id)); } catch (e) { fail(e); } }
     };
     const MK = "dompetku-merged-" + ROOM;
@@ -44,6 +47,11 @@ async function start() {
       window.dompetku.set(remote);
       setStatus("Tersinkron", "ok");
     }, (err) => setStatus("Sinkronisasi gagal: " + msg(err), "bad"));
+    fs.onSnapshot(authRef, (d) => {
+      const A = window.dompetkuAuth; if (!A) return;
+      if (d.exists() && d.data().hash) A.set(d.data().hash);
+      else if (A.custom()) fs.setDoc(authRef, { hash: A.get() }).catch(() => {});
+    }, (err) => setStatus("Tersinkron, tapi sandi belum tersinkron: " + msg(err), "bad"));
   } catch (e) { setStatus("Tidak bisa terhubung: " + msg(e), "bad"); }
 }
 start();
