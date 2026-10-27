@@ -1,17 +1,11 @@
-# Dompetku 🌸
+# Mengaktifkan berbagi catatan (Firebase)
 
-Aplikasi catatan keuangan pribadi. Bisa diinstal di HP (PWA) dan jalan offline.
-Data tersimpan di browser perangkat.
+1. Buka https://console.firebase.google.com, klik **Add project**, beri nama (misalnya `dompetku`). Google Analytics boleh dimatikan.
+2. Di halaman proyek, klik ikon **Web** (`</>`), beri nama aplikasi, klik Register. Salin nilai `apiKey`, `authDomain`, `projectId`, `appId`.
+3. Buka file `firebase-config.js` di repo (ikon pensil), ganti keempat nilai `ISI_DI_SINI`, lalu Commit.
+4. Di Firebase: **Build → Authentication → Get started → Sign-in method → Anonymous → Enable → Save**.
+5. Di Firebase: **Build → Firestore Database → Create database** (pilih lokasi terdekat, mode production).
+6. Buka tab **Rules** di Firestore, hapus isinya, tempel isi `firebase-rules.txt`, lalu **Publish**.
+7. Buka aplikasi, tab **Riwayat → Berbagi catatan → Mulai berbagi**, lalu **Salin tautan undangan** dan kirim ke pasangan atau keluarga.
 
-## Pasang di GitHub Pages
-1. Buat repository baru di GitHub (misalnya `dompetku`), set Public.
-2. Upload semua isi folder ini (`index.html`, `manifest.webmanifest`, `sw.js`, folder `icons`).
-3. Buka **Settings → Pages**. Pada *Build and deployment*, pilih **Deploy from a branch**, branch `main`, folder `/ (root)`, lalu Save.
-4. Tunggu 1–2 menit. Alamatnya: `https://USERNAME.github.io/dompetku/`
-
-## Instal di HP
-- **Android (Chrome)**: buka alamatnya, ketuk menu ⋮ → **Instal aplikasi** (atau **Tambahkan ke layar utama**).
-- **iPhone (Safari)**: ketuk tombol Bagikan → **Tambah ke Layar Utama**.
-
-## Memperbarui
-Setelah mengubah file, naikkan nomor versi `CACHE` di `sw.js` (misalnya `dompetku-v2`) supaya HP mengambil versi terbaru.
+Catatan keamanan: kode ruang bersifat rahasia. Siapa pun yang memilikinya bisa melihat dan mengubah catatan. Jangan unggah kode itu ke tempat umum.

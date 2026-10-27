@@ -1,5 +1,5 @@
-const CACHE = "dompetku-v2";
-const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./maskable-512.png", "./apple-touch-icon.png"];
+const CACHE = "dompetku-v3";
+const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./sync.js", "./firebase-config.js", "./icon-192.png", "./icon-512.png", "./maskable-512.png", "./apple-touch-icon.png"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()));
@@ -15,6 +15,9 @@ self.addEventListener("activate", (e) => {
 // Cache dulu, perbarui di belakang layar. Font Google ikut tersimpan agar tampilan tetap cantik saat offline.
 self.addEventListener("fetch", (e) => {
   if (e.request.method !== "GET") return;
+  const u = new URL(e.request.url);
+  const ok = u.origin === location.origin || ["fonts.googleapis.com", "fonts.gstatic.com", "www.gstatic.com"].includes(u.hostname);
+  if (!ok) return; // jangan cache lalu lintas Firebase
   e.respondWith(
     caches.match(e.request).then((hit) => {
       const net = fetch(e.request).then((res) => {

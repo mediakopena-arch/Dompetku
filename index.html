@@ -84,7 +84,7 @@ label{font-weight:700;font-size:13px;color:var(--mute);display:block;margin-top:
 input,select{width:100%;border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:14px;padding:11px 12px;font:600 15px var(--bd);margin:4px 0 10px}
 .save{width:100%;border:0;background:linear-gradient(135deg,#2f78d6,#0f2f66);color:#fff;border-radius:99px;padding:14px;font:800 16px var(--bd);cursor:pointer;margin-top:6px}
 .link{border:0;background:none;color:var(--mute);font:700 13px var(--bd);text-decoration:underline;cursor:pointer;display:block;margin:18px auto 0}
-.save.danger{background:var(--danger)}.sheet.dlg{align-items:center}.sheet.dlg .panel{border-radius:24px;width:calc(100% - 32px)}.sheet.dlg p{margin:6px 0 14px;color:var(--mute)}.view{display:none}.view.on{display:block}
+.save.danger{background:var(--danger)}.sheet.dlg{align-items:center}.sheet.dlg .panel{border-radius:24px;width:calc(100% - 32px)}.sheet.dlg p{margin:6px 0 14px;color:var(--mute)}.share h3{font-size:17px}.share p{margin:6px 0;color:var(--mute);font-size:13px}.share code{display:block;word-break:break-all;background:var(--soft);padding:8px 10px;border-radius:12px;margin:8px 0;font-size:13px;color:var(--ink)}.share .ok{color:var(--mint);font-weight:700}.share .bad{color:var(--danger);font-weight:700}.view{display:none}.view.on{display:block}
 </style>
 </head>
 <body>
@@ -101,6 +101,7 @@ input,select{width:100%;border:1.5px solid var(--line);background:var(--card);co
     <h2>Riwayat transaksi</h2>
     <input id="q" placeholder="Cari catatan atau kategori…" aria-label="Cari transaksi">
     <div class="card" id="all"></div>
+    <div class="card share" id="share" style="margin-top:12px"></div>
     <button class="link" id="reset">Hapus semua data</button>
   </section>
 
@@ -196,8 +197,8 @@ function shut(){$("dlg").classList.remove("on");pend=null}
 $("dNo").onclick=shut;$("dlg").onclick=function(e){if(e.target===this)shut()};
 $("dOk").onclick=function(){var f=pend;shut();if(f)f()};
 $("all").onclick=function(e){var d=e.target.getAttribute("data-d");if(!d)return;var t=tx.filter(function(x){return String(x.id)===d})[0];if(!t)return;
- ask("Hapus transaksi ini?",(t.note||t.cat)+" • "+(t.type==="in"?"+":"−")+rp(t.amt)+". Data yang dihapus tidak bisa dikembalikan.",function(){tx=tx.filter(function(x){return String(x.id)!==d});save();render()})};
-$("reset").onclick=function(){if(!tx.length)return;ask("Hapus semua data?","Seluruh "+tx.length+" transaksi akan hilang permanen dari perangkat ini dan tidak bisa dikembalikan.",function(){tx=[];save();render()})};
+ ask("Hapus transaksi ini?",(t.note||t.cat)+" • "+(t.type==="in"?"+":"−")+rp(t.amt)+". Data yang dihapus tidak bisa dikembalikan.",function(){del(d)})};
+$("reset").onclick=function(){if(!tx.length)return;ask("Hapus semua data?","Seluruh "+tx.length+" transaksi akan hilang permanen dan tidak bisa dikembalikan. Jika berbagi aktif, data ikut terhapus di perangkat lain.",function(){wipe()})};
 function cats(){cat=cat&&CAT[type].some(function(c){return c[0]===cat})?cat:CAT[type][0][0];$("cats").innerHTML=CAT[type].map(function(c){return'<button data-c="'+c[0]+'" class="'+(c[0]===cat?"on":"")+'">'+c[1]+" "+c[0]+"</button>"}).join("")}
 $("cats").onclick=function(e){var c=e.target.getAttribute("data-c");if(c){cat=c;cats()}};
 document.querySelectorAll(".seg button").forEach(function(b){b.onclick=function(){type=b.dataset.t;document.querySelectorAll(".seg button").forEach(function(x){x.classList.toggle("on",x===b)});cats()}});
@@ -207,12 +208,18 @@ $("add").onclick=function(){$("amt").value="";$("note").value="";$("date").value
 function close(){$("sheet").classList.remove("on")}
 $("cancel").onclick=close;$("sheet").onclick=function(e){if(e.target===this)close()};
 $("save").onclick=function(){var a=+$("amt").value.replace(/\D/g,"");if(!a){$("amt").focus();$("amt").placeholder="Isi nominal dulu";return}
- tx.push({id:Date.now(),type:type,amt:a,cat:cat,wal:$("wal").value,note:$("note").value.trim(),date:$("date").value||iso(new Date())});save();close();render()};
+ put({id:Date.now(),type:type,amt:a,cat:cat,wal:$("wal").value,note:$("note").value.trim(),date:$("date").value||iso(new Date())});close()};
+function sy(){return window.dompetkuSync}
+function put(o){tx.push(o);save();render();var y=sy();if(y)y.put(o)}
+function del(id){tx=tx.filter(function(x){return String(x.id)!==id});save();render();var y=sy();if(y)y.del(id)}
+function wipe(){var ids=tx.map(function(x){return String(x.id)});tx=[];save();render();var y=sy();if(y)y.wipe(ids)}
+window.dompetku={set:function(a){tx=a;save();render()},all:function(){return tx.slice()},key:KEY};
 render();
 })();
 </script>
 <script>
 if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})})}
 </script>
+<script type="module" src="sync.js"></script>
 </body>
 </html>
